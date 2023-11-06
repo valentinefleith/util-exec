@@ -1,0 +1,6 @@
+#!/usr/bin/bash
+set -o xtrace
+
+gcc -Wall -Wextra -Werror -o executable $1
+./executable
+rm executable
