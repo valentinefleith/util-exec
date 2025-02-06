@@ -1,0 +1,84 @@
+#!/bin/bash
+
+# Check if a filename argument is provided
+if [ -z "$1" ]; then
+    echo "Usage: $0 <filename without extension>"
+    exit 1
+fi
+
+# Get the filename from the first argument
+FILENAME=$1
+
+# Create the .tex file
+cat <<EOF > "$FILENAME.tex"
+\documentclass[12pt]{article}
+
+\newcommand{\numpy}{{\tt numpy}}    % tt font for numpy
+
+\topmargin -.5in
+\textheight 9in
+\oddsidemargin -.25in
+\evensidemargin -.25in
+\textwidth 7in
+
+\usepackage[french]{babel}
+\usepackage[T1]{fontenc}
+\usepackage{longtable}
+\usepackage{tabularx}
+
+\begin{document}
+
+\author{Valentine Fleith}
+\title{\textbf{TITRE DU RENDU}}
+\maketitle
+
+\smallskip
+
+\section{Titre section 1}
+
+\subsection{Titre sous-section 1}
+\par debut ici
+
+\end{document}
+\grid
+\grid
+EOF
+
+echo "$FILENAME.tex has been created."
+
+# Create the Makefile
+cat <<EOF > Makefile
+MAIN = $FILENAME
+
+LATEX = pdflatex
+
+all: \$(MAIN).pdf
+
+\$(MAIN).pdf: \$(MAIN).tex
+	@echo "Compiling \$(MAIN).tex...."
+	@\$(LATEX) \$(MAIN).tex
+	@\$(LATEX) \$(MAIN).tex
+	@echo "Paper compiled!"
+
+open: \$(MAIN).pdf clean
+	@open \$(MAIN).pdf
+
+re: fclean all
+
+fmt:
+	@latexindent -w \$(MAIN).tex > /dev/null
+	@echo "Latex file formatted!"
+
+clean:
+	@echo "Cleaning aux files..."
+	@rm -f \$(MAIN).aux \$(MAIN).log \$(MAIN).out \$(MAIN).toc \$(MAIN).bbl \$(MAIN).blg
+	@echo "All files cleaned!"
+
+fclean: clean
+	@echo "Removing pdf file..."
+	@rm -f \$(MAIN).pdf
+
+.PHONY: all clean fclean re
+EOF
+
+echo "Makefile has been created."
